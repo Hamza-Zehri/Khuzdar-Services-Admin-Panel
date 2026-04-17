@@ -3,6 +3,7 @@ import '../../core/models/all_models.dart';
 import '../../core/services/admin_firestore_service.dart';
 import '../../shared/widgets/data_table_widget.dart';
 import '../../shared/widgets/badge_widget.dart';
+import 'package:data_table_2/data_table_2.dart';
 import '../../core/constants/app_colors.dart';
 
 class AllProvidersScreen extends StatefulWidget {
@@ -110,13 +111,13 @@ class _AllProvidersScreenState extends State<AllProvidersScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 24.0),
                   child: CustomDataTable(
                     columns: const [
-                      DataColumn(label: Text('Name')),
-                      DataColumn(label: Text('Type')),
-                      DataColumn(label: Text('Category')),
-                      DataColumn(label: Text('Area')),
-                      DataColumn(label: Text('Rating')),
-                      DataColumn(label: Text('Status')),
-                      DataColumn(label: Text('Actions')),
+                      DataColumn2(label: Text('Name')),
+                      DataColumn2(label: Text('Type')),
+                      DataColumn2(label: Text('Category')),
+                      DataColumn2(label: Text('Area')),
+                      DataColumn2(label: Text('Rating')),
+                      DataColumn2(label: Text('Status')),
+                      DataColumn2(label: Text('Actions'), fixedWidth: 100),
                     ],
                     rows: providers.map((p) {
                       return DataRow(

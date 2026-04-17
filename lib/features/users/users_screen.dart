@@ -3,6 +3,7 @@ import '../../core/models/all_models.dart';
 import '../../core/services/admin_firestore_service.dart';
 import '../../shared/widgets/data_table_widget.dart';
 import '../../shared/widgets/badge_widget.dart';
+import 'package:data_table_2/data_table_2.dart';
 import '../../core/constants/app_colors.dart';
 
 class UsersScreen extends StatefulWidget {
@@ -99,12 +100,12 @@ class _UsersScreenState extends State<UsersScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 24.0),
                   child: CustomDataTable(
                     columns: const [
-                      DataColumn(label: Text('Name')),
-                      DataColumn(label: Text('Phone')),
-                      DataColumn(label: Text('Rating')),
-                      DataColumn(label: Text('Role')),
-                      DataColumn(label: Text('Status')),
-                      DataColumn(label: Text('Actions')),
+                      DataColumn2(label: Text('Name'), size: ColumnSize.L),
+                      DataColumn2(label: Text('Phone'), size: ColumnSize.L),
+                      DataColumn2(label: Text('Rating'), size: ColumnSize.S),
+                      DataColumn2(label: Text('Role'), size: ColumnSize.S),
+                      DataColumn2(label: Text('Status'), size: ColumnSize.S),
+                      DataColumn2(label: Text('Actions'), fixedWidth: 100),
                     ],
                     rows: users.map((u) {
                       final isLowRating = u.rating < 2.0 && u.rating > 0;

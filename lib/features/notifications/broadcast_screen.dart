@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../core/services/fcm_broadcast_service.dart';
 import '../../shared/widgets/badge_widget.dart';
 import '../../shared/widgets/data_table_widget.dart';
+import 'package:data_table_2/data_table_2.dart';
 import '../../core/constants/app_colors.dart';
 
 class BroadcastScreen extends StatefulWidget {
@@ -185,11 +186,11 @@ class _BroadcastScreenState extends State<BroadcastScreen> {
                           return CustomDataTable(
                             showBottomBorder: false,
                             columns: const [
-                              DataColumn(label: Text('Timestamp')),
-                              DataColumn(label: Text('Title')),
-                              DataColumn(label: Text('Target')),
-                              DataColumn(label: Text('Status')),
-                              DataColumn(label: Text('Actions')),
+                              DataColumn2(label: Text('Timestamp'), size: ColumnSize.L),
+                              DataColumn2(label: Text('Title'), size: ColumnSize.L),
+                              DataColumn2(label: Text('Target'), size: ColumnSize.M),
+                              DataColumn2(label: Text('Status'), size: ColumnSize.S),
+                              DataColumn2(label: Text('Actions'), fixedWidth: 80),
                             ],
                             rows: history.map((h) {
                               // Using try-catch or safe type check for timestamp in a real app
