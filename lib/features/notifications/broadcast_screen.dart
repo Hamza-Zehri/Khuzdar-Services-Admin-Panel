@@ -5,7 +5,7 @@ import '../../shared/widgets/data_table_widget.dart';
 import '../../core/constants/app_colors.dart';
 
 class BroadcastScreen extends StatefulWidget {
-  const BroadcastScreen({Key? key}) : super(key: key);
+  const BroadcastScreen({super.key});
 
   @override
   State<BroadcastScreen> createState() => _BroadcastScreenState();
@@ -19,6 +19,7 @@ class _BroadcastScreenState extends State<BroadcastScreen> {
   final _uidController = TextEditingController();
 
   String _selectedTarget = 'all_users';
+  String _selectedMethod = 'both';
 
   bool _isLoading = false;
 
@@ -30,6 +31,7 @@ class _BroadcastScreenState extends State<BroadcastScreen> {
           title: _titleController.text,
           body: _bodyController.text,
           target: _selectedTarget,
+          method: _selectedMethod,
           specificUid: _selectedTarget == 'specific' ? _uidController.text : null,
         );
         _titleController.clear();
@@ -82,30 +84,33 @@ class _BroadcastScreenState extends State<BroadcastScreen> {
                           validator: (v) => v!.isEmpty ? 'Required' : null,
                         ),
                         const SizedBox(height: 24),
-                        const Text('Target Audience', style: TextStyle(fontWeight: FontWeight.bold)),
-                        RadioListTile(
-                          title: const Text('All Users'),
-                          value: 'all_users',
+                        RadioGroup<String>(
                           groupValue: _selectedTarget,
                           onChanged: (v) => setState(() => _selectedTarget = v.toString()),
-                        ),
-                        RadioListTile(
-                          title: const Text('All Providers'),
-                          value: 'all_providers',
-                          groupValue: _selectedTarget,
-                          onChanged: (v) => setState(() => _selectedTarget = v.toString()),
-                        ),
-                        RadioListTile(
-                          title: const Text('Approved Providers Only'),
-                          value: 'approved_providers',
-                          groupValue: _selectedTarget,
-                          onChanged: (v) => setState(() => _selectedTarget = v.toString()),
-                        ),
-                        RadioListTile(
-                          title: const Text('Specific User (UID)'),
-                          value: 'specific',
-                          groupValue: _selectedTarget,
-                          onChanged: (v) => setState(() => _selectedTarget = v.toString()),
+                          child: Column(
+                            children: [
+                              RadioListTile(
+                                title: const Text('All Users'),
+                                value: 'all_users',
+                              ),
+                              RadioListTile(
+                                title: const Text('All Clients (Customers Only)'),
+                                value: 'all_clients',
+                              ),
+                              RadioListTile(
+                                title: const Text('All Providers'),
+                                value: 'all_providers',
+                              ),
+                              RadioListTile(
+                                title: const Text('Approved Providers Only'),
+                                value: 'approved_providers',
+                              ),
+                              RadioListTile(
+                                title: const Text('Specific User (UID)'),
+                                value: 'specific',
+                              ),
+                            ],
+                          ),
                         ),
                         if (_selectedTarget == 'specific') ...[
                           const SizedBox(height: 16),
@@ -115,6 +120,28 @@ class _BroadcastScreenState extends State<BroadcastScreen> {
                             validator: (v) => _selectedTarget == 'specific' && v!.isEmpty ? 'Required' : null,
                           ),
                         ],
+                        const SizedBox(height: 24),
+                        const Text('Delivery Method', style: TextStyle(fontWeight: FontWeight.bold)),
+                        RadioGroup<String>(
+                          groupValue: _selectedMethod,
+                          onChanged: (v) => setState(() => _selectedMethod = v.toString()),
+                          child: Column(
+                            children: [
+                              RadioListTile(
+                                title: const Text('Push Notification Only'),
+                                value: 'notification',
+                              ),
+                              RadioListTile(
+                                title: const Text('In-App Message Only'),
+                                value: 'in_app',
+                              ),
+                              RadioListTile(
+                                title: const Text('Both (Recommended)'),
+                                value: 'both',
+                              ),
+                            ],
+                          ),
+                        ),
                         const SizedBox(height: 32),
                         SizedBox(
                           width: double.infinity,

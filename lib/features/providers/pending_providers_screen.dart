@@ -5,7 +5,7 @@ import '../../shared/widgets/badge_widget.dart';
 import '../../core/constants/app_colors.dart';
 
 class PendingProvidersScreen extends StatefulWidget {
-  const PendingProvidersScreen({Key? key}) : super(key: key);
+  const PendingProvidersScreen({super.key});
 
   @override
   State<PendingProvidersScreen> createState() => _PendingProvidersScreenState();
@@ -44,6 +44,7 @@ class _PendingProvidersScreenState extends State<PendingProvidersScreen> {
 
     if (reason != null && reason.isNotEmpty && mounted) {
       await _firestoreService.rejectProvider(id, reason);
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Provider Rejected'), backgroundColor: AppColors.danger));
     }
   }
@@ -88,7 +89,7 @@ class _PendingProvidersScreenState extends State<PendingProvidersScreen> {
                   child: Row(
                     children: [
                       CircleAvatar(
-                        backgroundColor: AppColors.primary.withOpacity(0.1),
+                        backgroundColor: AppColors.primary.withValues(alpha: 0.1),
                         child: Text(provider.type == ProviderType.shop ? '🏪' : '👤'),
                       ),
                       const SizedBox(width: 16),
@@ -96,9 +97,25 @@ class _PendingProvidersScreenState extends State<PendingProvidersScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              provider.type == ProviderType.shop ? (provider.shop?.shopName ?? provider.userId) : provider.userId,
-                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                            FutureBuilder<UserModel?>(
+                              future: _firestoreService.fetchUserInfo(provider.userId),
+                              builder: (context, userSnap) {
+                                final name = userSnap.data?.name ?? 'Loading...';
+                                final phone = userSnap.data?.phone ?? '';
+                                return Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      provider.type == ProviderType.shop 
+                                          ? '${provider.shop?.shopName ?? 'Shop'} ($name)'
+                                          : name,
+                                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                    ),
+                                    if (phone.isNotEmpty)
+                                      Text(phone, style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                                  ],
+                                );
+                              },
                             ),
                             const SizedBox(height: 4),
                             Text('${provider.category.label} • ${provider.area}', style: const TextStyle(color: AppColors.textSecondary)),

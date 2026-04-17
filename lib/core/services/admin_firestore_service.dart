@@ -61,9 +61,32 @@ class AdminFirestoreService {
   }
 
   Future<void> approveProvider(String providerId) async {
-    await _db.collection(FirestorePaths.providers).doc(providerId).update({
-      'verificationStatus': 'approved',
+    final doc = await _db.collection(FirestorePaths.providers).doc(providerId).get();
+    if (!doc.exists) return;
+
+    final provider = ProviderModel.fromFirestore(doc);
+    final batch = _db.batch();
+
+    // 1. Update provider verification status
+    batch.update(_db.collection(FirestorePaths.providers).doc(providerId), {
+      'verificationStatus': VerificationStatus.approved.name,
+      'isAvailable': true,
     });
+
+    // 2. Update associated user's role to 'provider'
+    batch.update(_db.collection(FirestorePaths.users).doc(provider.userId), {
+      'role': UserRole.provider.name,
+    });
+
+    await batch.commit();
+  }
+
+  Future<UserModel?> fetchUserInfo(String userId) async {
+    final doc = await _db.collection(FirestorePaths.users).doc(userId).get();
+    if (doc.exists) {
+      return UserModel.fromFirestore(doc);
+    }
+    return null;
   }
 
   Future<void> rejectProvider(String providerId, String reason) async {
@@ -116,6 +139,16 @@ class AdminFirestoreService {
       return u.phone;
     }
     return 'Unknown';
+  }
+
+  /// Delete a user and their associated provider profile atomically
+  Future<void> deleteUser(String userId) async {
+    final batch = _db.batch();
+    // Delete user document
+    batch.delete(_db.collection(FirestorePaths.users).doc(userId));
+    // Delete provider document if it exists (provider ID == userId by design)
+    batch.delete(_db.collection(FirestorePaths.providers).doc(userId));
+    await batch.commit();
   }
 
   // Chats

@@ -6,7 +6,7 @@ import '../../shared/widgets/stat_card.dart';
 import '../../core/constants/app_colors.dart';
 
 class DashboardScreen extends StatelessWidget {
-  const DashboardScreen({Key? key}) : super(key: key);
+  const DashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -98,7 +98,7 @@ class DashboardScreen extends StatelessWidget {
                                     color: AppColors.primary,
                                     barWidth: 4,
                                     dotData: const FlDotData(show: false),
-                                    belowBarData: BarAreaData(show: true, color: AppColors.primary.withOpacity(0.2)),
+                                    belowBarData: BarAreaData(show: true, color: AppColors.primary.withValues(alpha: 0.2)),
                                   ),
                                 ],
                               ),

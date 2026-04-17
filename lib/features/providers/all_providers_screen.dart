@@ -6,7 +6,7 @@ import '../../shared/widgets/badge_widget.dart';
 import '../../core/constants/app_colors.dart';
 
 class AllProvidersScreen extends StatefulWidget {
-  const AllProvidersScreen({Key? key}) : super(key: key);
+  const AllProvidersScreen({super.key});
 
   @override
   State<AllProvidersScreen> createState() => _AllProvidersScreenState();
@@ -25,6 +25,34 @@ class _AllProvidersScreenState extends State<AllProvidersScreen> {
         const SnackBar(content: Text('Requested block for associated user')),
       );
     }
+  }
+
+  void _confirmDelete(ProviderModel provider) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Provider?'),
+        content: Text('Are you sure you want to PERMANENTLY delete this provider and their associated user account? This cannot be undone.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              await _firestoreService.deleteUser(provider.userId);
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Provider and user deleted successfully'), backgroundColor: AppColors.danger),
+                );
+              }
+            },
+            child: const Text('Delete Permanently', style: TextStyle(color: AppColors.danger)),
+          ),
+        ],
+      ),
+    );
   }
 
 
@@ -93,7 +121,15 @@ class _AllProvidersScreenState extends State<AllProvidersScreen> {
                     rows: providers.map((p) {
                       return DataRow(
                         cells: [
-                          DataCell(Text(p.type == ProviderType.shop ? (p.shop?.shopName ?? p.userId) : p.userId)),
+                          DataCell(
+                            FutureBuilder<UserModel?>(
+                              future: _firestoreService.fetchUserInfo(p.userId),
+                              builder: (context, userSnap) {
+                                final name = userSnap.data?.name ?? '...';
+                                return Text(p.type == ProviderType.shop ? (p.shop?.shopName ?? 'Shop ($name)') : name);
+                              },
+                            ),
+                          ),
                           DataCell(Text(p.type == ProviderType.shop ? 'Shop' : 'Individual')),
                           DataCell(Text(p.category.label)),
                           DataCell(Text(p.area)),
@@ -109,8 +145,13 @@ class _AllProvidersScreenState extends State<AllProvidersScreen> {
                               children: [
                                 IconButton(
                                   icon: const Icon(Icons.block, color: AppColors.danger),
-                                  tooltip: 'Block Associated User',
+                                  tooltip: 'Block User',
                                   onPressed: () => _toggleBlock(p),
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.delete_outline, color: AppColors.danger),
+                                  tooltip: 'Remove Provider',
+                                  onPressed: () => _confirmDelete(p),
                                 ),
                               ],
                             )

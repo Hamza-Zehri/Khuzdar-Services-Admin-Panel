@@ -8,12 +8,12 @@ class StatCard extends StatelessWidget {
   final Color? accentColor;
 
   const StatCard({
-    Key? key,
+    super.key,
     required this.title,
     required this.value,
     this.icon,
     this.accentColor,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

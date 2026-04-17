@@ -16,7 +16,7 @@ import 'features/notifications/broadcast_screen.dart';
 import 'features/reports/reports_screen.dart';
 
 class AdminApp extends StatelessWidget {
-  const AdminApp({Key? key}) : super(key: key);
+  const AdminApp({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -5,7 +5,7 @@ import '../../shared/widgets/badge_widget.dart';
 import '../../core/constants/app_colors.dart';
 
 class ReportsScreen extends StatefulWidget {
-  const ReportsScreen({Key? key}) : super(key: key);
+  const ReportsScreen({super.key});
 
   @override
   State<ReportsScreen> createState() => _ReportsScreenState();
@@ -62,7 +62,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 final date = r['createdAt'] != null ? r['createdAt'].toDate().toString() : '';
 
                 return DataRow(
-                  color: MaterialStateProperty.all(isResolved ? null : AppColors.accent.withOpacity(0.05)),
+                  color: WidgetStateProperty.all(isResolved ? null : AppColors.accent.withValues(alpha: 0.05)),
                   cells: [
                     DataCell(Text(r['reporterName'] ?? 'Unknown')),
                     DataCell(Text((r['reportedUid'] ?? 'Unknown').toString().substring(0, 8))), // Should have real id

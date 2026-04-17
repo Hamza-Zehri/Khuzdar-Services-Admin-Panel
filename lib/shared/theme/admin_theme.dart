@@ -9,7 +9,6 @@ class AdminTheme {
       colorScheme: ColorScheme.fromSeed(
         seedColor: AppColors.primary,
         primary: AppColors.primary,
-        background: AppColors.background,
         surface: AppColors.surface,
         error: AppColors.danger,
       ),
@@ -31,14 +30,14 @@ class AdminTheme {
       cardTheme: CardThemeData(
         color: AppColors.surface,
         elevation: 2,
-        shadowColor: Colors.black.withOpacity(0.05),
+        shadowColor: Colors.black.withValues(alpha: 0.05),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
       dataTableTheme: DataTableThemeData(
-        headingRowColor: MaterialStateProperty.all(AppColors.background),
-        dataRowColor: MaterialStateProperty.resolveWith((states) {
-          if (states.contains(MaterialState.hovered)) {
-            return AppColors.primary.withOpacity(0.05);
+        headingRowColor: WidgetStateProperty.all(AppColors.background),
+        dataRowColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.hovered)) {
+            return AppColors.primary.withValues(alpha: 0.05);
           }
           return AppColors.surface;
         }),

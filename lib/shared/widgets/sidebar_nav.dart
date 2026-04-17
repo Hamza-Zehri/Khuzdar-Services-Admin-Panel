@@ -8,7 +8,7 @@ import 'badge_widget.dart';
 class SidebarNav extends StatelessWidget {
   final Widget child;
 
-  const SidebarNav({Key? key, required this.child}) : super(key: key);
+  const SidebarNav({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {
@@ -121,18 +121,29 @@ class SidebarNav extends StatelessWidget {
               }
             ),
           ),
-          // Bottom admin profile
+          // Bottom admin profile & credits
           const Padding(
-            padding: EdgeInsets.all(16.0),
+            padding: EdgeInsets.fromLTRB(16, 8, 16, 4),
             child: Row(
               children: [
                 Icon(Icons.person, color: AppColors.sidebarText),
                 SizedBox(width: 8),
                 Text(
                   'Super Admin',
-                  style: TextStyle(color: AppColors.sidebarText),
+                  style: TextStyle(color: AppColors.sidebarText, fontWeight: FontWeight.w600),
                 ),
               ],
+            ),
+          ),
+          const Padding(
+            padding: EdgeInsets.fromLTRB(16, 0, 16, 16),
+            child: Text(
+              '© Developed by Engr. Hamza Asad',
+              style: TextStyle(
+                color: Color(0xFF6B7280),
+                fontSize: 10,
+                letterSpacing: 0.2,
+              ),
             ),
           ),
         ],
@@ -164,7 +175,7 @@ class _NavItem extends StatelessWidget {
         onTap: onTap,
         child: Container(
           decoration: BoxDecoration(
-            color: isSelected ? AppColors.primary.withOpacity(0.15) : Colors.transparent,
+            color: isSelected ? AppColors.primary.withValues(alpha: 0.15) : Colors.transparent,
             border: isSelected ? const Border(left: BorderSide(color: AppColors.primary, width: 4)) : null,
           ),
           padding: EdgeInsets.symmetric(horizontal: isSelected ? 12.0 : 16.0, vertical: 12.0),
@@ -172,7 +183,7 @@ class _NavItem extends StatelessWidget {
             children: [
               Icon(
                 icon,
-                color: isSelected ? AppColors.primary : AppColors.sidebarText.withOpacity(0.7),
+                color: isSelected ? AppColors.primary : AppColors.sidebarText.withValues(alpha: 0.7),
                 size: 20,
               ),
               const SizedBox(width: 16),
@@ -180,7 +191,7 @@ class _NavItem extends StatelessWidget {
                 child: Text(
                   title,
                   style: TextStyle(
-                    color: isSelected ? AppColors.sidebarText : AppColors.sidebarText.withOpacity(0.7),
+                    color: isSelected ? AppColors.sidebarText : AppColors.sidebarText.withValues(alpha: 0.7),
                     fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                     fontSize: 14,
                   ),

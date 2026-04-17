@@ -8,12 +8,12 @@ class CustomDataTable extends StatelessWidget {
   final bool showBottomBorder;
 
   const CustomDataTable({
-    Key? key,
+    super.key,
     required this.columns,
     required this.rows,
     this.minWidth = 600,
     this.showBottomBorder = true,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

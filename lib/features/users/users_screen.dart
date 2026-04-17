@@ -6,7 +6,7 @@ import '../../shared/widgets/badge_widget.dart';
 import '../../core/constants/app_colors.dart';
 
 class UsersScreen extends StatefulWidget {
-  const UsersScreen({Key? key}) : super(key: key);
+  const UsersScreen({super.key});
 
   @override
   State<UsersScreen> createState() => _UsersScreenState();
@@ -15,7 +15,7 @@ class UsersScreen extends StatefulWidget {
 class _UsersScreenState extends State<UsersScreen> {
   final AdminFirestoreService _firestoreService = AdminFirestoreService();
   String _searchQuery = '';
-  Map<String, String> _revealedPhones = {};
+  final Map<String, String> _revealedPhones = {};
 
   void _toggleBlock(UserModel user) async {
     if (user.isBlocked) {
@@ -30,6 +30,32 @@ class _UsersScreenState extends State<UsersScreen> {
     setState(() {
       _revealedPhones[userId] = phone;
     });
+  }
+
+  void _deleteUser(UserModel user) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Delete User'),
+        content: Text(
+          'Are you sure you want to permanently delete "${user.name.isEmpty ? user.id.substring(0, 8) : user.name}"?\n\nThis will also remove their provider profile. This action cannot be undone.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.danger),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Delete', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true) {
+      await _firestoreService.deleteUser(user.id);
+    }
   }
 
   @override
@@ -83,18 +109,18 @@ class _UsersScreenState extends State<UsersScreen> {
                     rows: users.map((u) {
                       final isLowRating = u.rating < 2.0 && u.rating > 0;
                       return DataRow(
-                        color: MaterialStateProperty.all(
+                        color: WidgetStateProperty.all(
                           u.isBlocked 
                             ? AppColors.background 
-                            : (isLowRating ? AppColors.danger.withOpacity(0.05) : null)
+                            : (isLowRating ? AppColors.danger.withValues(alpha: 0.05) : null)
                         ),
                         cells: [
-                          DataCell(Text(u.name)),
+                          DataCell(Text(u.name.isEmpty ? 'ID: ${u.id.substring(0, 8)}' : u.name)),
                           DataCell(
                             Row(
                               children: [
-                                Text(_revealedPhones[u.id] ?? '***-****'),
-                                if (!_revealedPhones.containsKey(u.id))
+                                Text(_revealedPhones[u.id] ?? (u.phone.isEmpty ? 'No Phone' : u.maskedPhone)),
+                                if (!_revealedPhones.containsKey(u.id) && u.phone.isNotEmpty)
                                   IconButton(
                                     icon: const Icon(Icons.visibility, size: 16),
                                     onPressed: () => _revealPhone(u.id),
@@ -113,12 +139,21 @@ class _UsersScreenState extends State<UsersScreen> {
                           DataCell(
                             Row(
                               children: [
-                                if (u.role != 'admin')
-                                IconButton(
-                                  icon: Icon(u.isBlocked ? Icons.lock_open : Icons.block, color: u.isBlocked ? Colors.green : AppColors.danger),
-                                  tooltip: u.isBlocked ? 'Unblock' : 'Block',
-                                  onPressed: () => _toggleBlock(u),
-                                ),
+                                if (u.role != UserRole.admin)
+                                  IconButton(
+                                    icon: Icon(
+                                      u.isBlocked ? Icons.lock_open : Icons.block,
+                                      color: u.isBlocked ? Colors.green : AppColors.danger,
+                                    ),
+                                    tooltip: u.isBlocked ? 'Unblock' : 'Block',
+                                    onPressed: () => _toggleBlock(u),
+                                  ),
+                                if (u.role != UserRole.admin)
+                                  IconButton(
+                                    icon: const Icon(Icons.delete_outline, color: AppColors.danger),
+                                    tooltip: 'Delete User',
+                                    onPressed: () => _deleteUser(u),
+                                  ),
                               ],
                             )
                           ),

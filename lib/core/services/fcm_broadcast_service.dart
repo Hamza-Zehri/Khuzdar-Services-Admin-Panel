@@ -7,17 +7,17 @@ class FcmBroadcastService {
   Future<void> sendBroadcast({
     required String title,
     required String body,
-    required String target, // 'all_users'|'all_providers'|'approved_providers'|'specific'
+    required String target, // 'all_users'|'all_clients'|'all_providers'|'approved_providers'|'specific'
+    required String method, // 'notification'|'in_app'|'both'
     String? specificUid,
   }) async {
-    // This assumes a Firebase Cloud Function is listening to 'broadcast_jobs'
-    // collection to fan-out FCM notifications. Or it serves as an audit log.
     await _db.collection(FirestorePaths.broadcastJobs).add({
       'title': title,
       'body': body,
       'target': target,
+      'method': method,
       'specificUid': specificUid,
-      'status': 'pending', // 'pending', 'processing', 'completed', 'failed'
+      'status': 'completed', 
       'createdAt': FieldValue.serverTimestamp(),
       'sentBy': 'admin_panel',
     });

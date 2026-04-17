@@ -5,7 +5,7 @@ import '../../providers/admin_auth_provider.dart';
 import '../../core/constants/app_colors.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  const LoginScreen({super.key});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -25,7 +25,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _login() async {
     if (_formKey.currentState!.validate()) {
-      final authProvider = Provider.of<AdminAuthProvider>(context, listen: false);
+      final authProvider = Provider.of<AdminAuthProvider>(
+        context,
+        listen: false,
+      );
       final success = await authProvider.signIn(
         _emailController.text.trim(),
         _passwordController.text,
@@ -58,8 +61,11 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.admin_panel_settings,
-                        size: 64, color: AppColors.primary),
+                    const Icon(
+                      Icons.admin_panel_settings,
+                      size: 64,
+                      color: AppColors.primary,
+                    ),
                     const SizedBox(height: 16),
                     const Text(
                       'Admin Login',
@@ -112,6 +118,17 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         );
                       },
+                    ),
+                    const SizedBox(height: 24),
+                    // Developer Credits
+                    const Text(
+                      '© Developed by Engr. Hamza Asad',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: Color(0xFF9CA3AF),
+                        letterSpacing: 0.3,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
                   ],
                 ),

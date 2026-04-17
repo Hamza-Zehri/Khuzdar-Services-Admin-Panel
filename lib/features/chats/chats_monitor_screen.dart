@@ -6,7 +6,7 @@ import '../../shared/widgets/badge_widget.dart';
 import '../../core/constants/app_colors.dart';
 
 class ChatsMonitorScreen extends StatefulWidget {
-  const ChatsMonitorScreen({Key? key}) : super(key: key);
+  const ChatsMonitorScreen({super.key});
 
   @override
   State<ChatsMonitorScreen> createState() => _ChatsMonitorScreenState();
@@ -23,7 +23,6 @@ class _ChatsMonitorScreenState extends State<ChatsMonitorScreen> {
       case ChatStatus.contactVisible: return Colors.green;
       case ChatStatus.completed: return Colors.green[800]!;
       case ChatStatus.cancelled: return AppColors.danger;
-      default: return Colors.grey;
     }
   }
 
@@ -72,7 +71,7 @@ class _ChatsMonitorScreenState extends State<ChatsMonitorScreen> {
                                 margin: const EdgeInsets.only(bottom: 8),
                                 padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
-                                  color: isUser ? AppColors.background : AppColors.primary.withOpacity(0.1),
+                                  color: isUser ? AppColors.background : AppColors.primary.withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Text(msg.message),
