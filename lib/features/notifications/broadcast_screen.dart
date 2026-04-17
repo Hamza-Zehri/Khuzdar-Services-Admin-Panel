@@ -189,6 +189,7 @@ class _BroadcastScreenState extends State<BroadcastScreen> {
                               DataColumn(label: Text('Title')),
                               DataColumn(label: Text('Target')),
                               DataColumn(label: Text('Status')),
+                              DataColumn(label: Text('Actions')),
                             ],
                             rows: history.map((h) {
                               // Using try-catch or safe type check for timestamp in a real app
@@ -202,6 +203,14 @@ class _BroadcastScreenState extends State<BroadcastScreen> {
                                     BadgeWidget(
                                       text: h['status'] ?? 'unknown',
                                       color: h['status'] == 'completed' ? Colors.green : AppColors.accent,
+                                    )
+                                  ),
+                                  DataCell(
+                                    IconButton(
+                                      icon: const Icon(Icons.delete_outline, color: AppColors.danger),
+                                      onPressed: () async {
+                                        await _fcmService.deleteBroadcast(h['id']);
+                                      },
                                     )
                                   ),
                                 ]

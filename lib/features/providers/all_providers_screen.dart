@@ -42,7 +42,7 @@ class _AllProvidersScreenState extends State<AllProvidersScreen> {
             onPressed: () async {
               Navigator.pop(context);
               await _firestoreService.deleteUser(provider.userId);
-              if (mounted) {
+              if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Provider and user deleted successfully'), backgroundColor: AppColors.danger),
                 );

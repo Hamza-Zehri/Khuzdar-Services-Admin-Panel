@@ -33,4 +33,8 @@ class FcmBroadcastService {
               return data;
             }).toList());
   }
+
+  Future<void> deleteBroadcast(String id) async {
+    await _db.collection(FirestorePaths.broadcastJobs).doc(id).delete();
+  }
 }
