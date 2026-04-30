@@ -4,7 +4,6 @@ import '../../core/models/all_models.dart';
 import '../../core/services/admin_firestore_service.dart';
 import '../../shared/widgets/data_table_widget.dart';
 import '../../shared/widgets/badge_widget.dart';
-import 'package:data_table_2/data_table_2.dart';
 import '../../core/constants/app_colors.dart';
 
 class UsersScreen extends StatefulWidget {
