@@ -18,6 +18,9 @@ class AdminAuthProvider extends ChangeNotifier {
   String? get error => _error;
 
   void _init() {
+    // Force sign out on every load to ensure password is asked every time
+    _authService.signOut();
+    
     _authService.authStateChanges.listen((User? user) {
       _user = user;
       notifyListeners();

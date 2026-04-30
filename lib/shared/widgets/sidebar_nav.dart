@@ -122,6 +122,13 @@ class SidebarNav extends StatelessWidget {
                       isSelected: location == '/categories',
                       onTap: () => context.go('/categories'),
                     ),
+                    const Divider(color: Colors.white24, height: 32),
+                    _NavItem(
+                      icon: Icons.logout,
+                      title: 'Logout',
+                      isSelected: false,
+                      onTap: () => Provider.of<AdminAuthProvider>(context, listen: false).signOut(),
+                    ),
                   ],
                 );
               }
