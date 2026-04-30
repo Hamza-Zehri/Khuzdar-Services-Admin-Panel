@@ -116,6 +116,12 @@ class SidebarNav extends StatelessWidget {
                       isSelected: location == '/reports',
                       onTap: () => context.go('/reports'),
                     ),
+                    _NavItem(
+                      icon: Icons.category_outlined,
+                      title: 'Categories',
+                      isSelected: location == '/categories',
+                      onTap: () => context.go('/categories'),
+                    ),
                   ],
                 );
               }

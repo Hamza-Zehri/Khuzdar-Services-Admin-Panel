@@ -184,4 +184,24 @@ class AdminFirestoreService {
       'resolvedAt': FieldValue.serverTimestamp(),
     });
   }
+
+  // Categories
+  Stream<List<CategoryModel>> streamCategories() {
+    return _db.collection(FirestorePaths.categories)
+        .orderBy('order')
+        .snapshots()
+        .map((snap) => snap.docs.map((d) => CategoryModel.fromFirestore(d)).toList());
+  }
+
+  Future<void> addCategory(CategoryModel category) async {
+    await _db.collection(FirestorePaths.categories).add(category.toFirestore());
+  }
+
+  Future<void> updateCategory(CategoryModel category) async {
+    await _db.collection(FirestorePaths.categories).doc(category.id).update(category.toFirestore());
+  }
+
+  Future<void> deleteCategory(String categoryId) async {
+    await _db.collection(FirestorePaths.categories).doc(categoryId).delete();
+  }
 }

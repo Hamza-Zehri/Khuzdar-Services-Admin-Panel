@@ -17,7 +17,7 @@ class FcmBroadcastService {
       'target': target,
       'method': method,
       'specificUid': specificUid,
-      'status': 'completed', 
+      'status': 'completed', // 'pending', 'processing', 'completed', 'failed'
       'createdAt': FieldValue.serverTimestamp(),
       'sentBy': 'admin_panel',
     });

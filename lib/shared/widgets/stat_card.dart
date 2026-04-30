@@ -19,7 +19,7 @@ class StatCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: Container(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(12.0),
         decoration: BoxDecoration(
           border: accentColor != null ? Border(left: BorderSide(color: accentColor!, width: 4)) : null,
           borderRadius: BorderRadius.circular(16),

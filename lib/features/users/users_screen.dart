@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:data_table_2/data_table_2.dart';
 import '../../core/models/all_models.dart';
 import '../../core/services/admin_firestore_service.dart';
 import '../../shared/widgets/data_table_widget.dart';
@@ -105,7 +106,7 @@ class _UsersScreenState extends State<UsersScreen> {
                       DataColumn2(label: Text('Rating'), size: ColumnSize.S),
                       DataColumn2(label: Text('Role'), size: ColumnSize.S),
                       DataColumn2(label: Text('Status'), size: ColumnSize.S),
-                      DataColumn2(label: Text('Actions'), fixedWidth: 100),
+                      DataColumn2(label: Text('Actions'), size: ColumnSize.M),
                     ],
                     rows: users.map((u) {
                       final isLowRating = u.rating < 2.0 && u.rating > 0;
@@ -119,8 +120,14 @@ class _UsersScreenState extends State<UsersScreen> {
                           DataCell(Text(u.name.isEmpty ? 'ID: ${u.id.substring(0, 8)}' : u.name)),
                           DataCell(
                             Row(
+                              mainAxisSize: MainAxisSize.min,
                               children: [
-                                Text(_revealedPhones[u.id] ?? (u.phone.isEmpty ? 'No Phone' : u.maskedPhone)),
+                                Expanded(
+                                  child: Text(
+                                    _revealedPhones[u.id] ?? (u.phone.isEmpty ? 'No Phone' : u.maskedPhone),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
                                 if (!_revealedPhones.containsKey(u.id) && u.phone.isNotEmpty)
                                   IconButton(
                                     icon: const Icon(Icons.visibility, size: 16),
@@ -139,6 +146,7 @@ class _UsersScreenState extends State<UsersScreen> {
                           ),
                           DataCell(
                             Row(
+                              mainAxisSize: MainAxisSize.min,
                               children: [
                                 if (u.role != UserRole.admin)
                                   IconButton(
