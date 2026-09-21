@@ -23,7 +23,13 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AdminAuthProvider()),
-        ChangeNotifierProvider(create: (_) => StatsProvider()),
+        ChangeNotifierProxyProvider<AdminAuthProvider, StatsProvider>(
+          create: (_) => StatsProvider(),
+          update: (_, auth, stats) {
+            stats?.updateAuth(auth.isAuthenticated);
+            return stats!;
+          },
+        ),
       ],
       child: !firebaseInitialized 
         ? const MaterialApp(home: Scaffold(body: Center(child: Text('Failed to initialize Firebase. Please check your configuration.'))))

@@ -29,6 +29,7 @@ class _LoginScreenState extends State<LoginScreen> {
         context,
         listen: false,
       );
+      authProvider.clearError();
       final success = await authProvider.signIn(
         _emailController.text.trim(),
         _passwordController.text,
@@ -36,13 +37,15 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (success && mounted) {
         context.go('/');
-      } else if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(authProvider.error ?? 'Login failed'),
-            backgroundColor: AppColors.danger,
-          ),
-        );
+      }
+    }
+  }
+
+  void _clearError() {
+    if (mounted) {
+      final authProvider = context.read<AdminAuthProvider>();
+      if (authProvider.error != null) {
+        authProvider.clearError();
       }
     }
   }
@@ -77,6 +80,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 32),
                     TextFormField(
                       controller: _emailController,
+                      keyboardType: TextInputType.emailAddress,
+                      autocorrect: false,
                       decoration: const InputDecoration(
                         labelText: 'Email',
                         border: OutlineInputBorder(),
@@ -84,6 +89,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       validator: (v) =>
                           v == null || v.isEmpty ? 'Required' : null,
+                      onChanged: (_) => _clearError(),
                       onFieldSubmitted: (_) => _login(),
                     ),
                     const SizedBox(height: 16),
@@ -97,6 +103,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       validator: (v) =>
                           v == null || v.isEmpty ? 'Required' : null,
+                      onChanged: (_) => _clearError(),
                       onFieldSubmitted: (_) => _login(),
                     ),
                     const SizedBox(height: 32),
@@ -120,6 +127,45 @@ class _LoginScreenState extends State<LoginScreen> {
                       },
                     ),
                     const SizedBox(height: 24),
+                    // Inline error feedback
+                    Consumer<AdminAuthProvider>(
+                      builder: (context, auth, _) {
+                        final error = auth.error;
+                        if (error == null) {
+                          return const SizedBox.shrink();
+                        }
+                        return Container(
+                          width: double.infinity,
+                          margin: const EdgeInsets.only(bottom: 16),
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: AppColors.danger.withValues(alpha: 0.08),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: AppColors.danger.withValues(alpha: 0.5),
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.error_outline,
+                                color: AppColors.danger,
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  error,
+                                  style: const TextStyle(
+                                    color: AppColors.danger,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
                     // Developer Credits
                     const Text(
                       '© Developed by Engr. Hamza Asad',

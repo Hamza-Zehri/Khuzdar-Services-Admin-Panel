@@ -18,12 +18,20 @@ class AdminAuthProvider extends ChangeNotifier {
   String? get error => _error;
 
   void _init() {
-    // Force sign out on every load to ensure password is asked every time
-    _authService.signOut();
-    
-    _authService.authStateChanges.listen((User? user) {
-      _user = user;
-      notifyListeners();
+    // Force sign out on every load to ensure password is asked every time.
+    // Awaiting it avoids a race where a stale session is cleared mid-login.
+    Future<void>.delayed(Duration.zero, () async {
+      try {
+        await _authService.signOut();
+      } catch (_) {}
+      _authService.authStateChanges.listen((User? user) {
+        // `_user` is only set after a fully verified, claim-synced sign-in.
+        // Here we only react to sign-outs.
+        if (user == null && _user != null) {
+          _user = null;
+          notifyListeners();
+        }
+      });
     });
   }
 
@@ -40,13 +48,18 @@ class AdminAuthProvider extends ChangeNotifier {
       }
       return false;
     } catch (e) {
-      _setError(e.toString());
+      final friendly = e is FirebaseAuthException && e.message != null
+          ? e.message!
+          : e.toString();
+      _setError(friendly);
       _setLoading(false);
       return false;
     }
   }
 
   Future<void> signOut() async {
+    _user = null;
+    notifyListeners();
     await _authService.signOut();
   }
 
