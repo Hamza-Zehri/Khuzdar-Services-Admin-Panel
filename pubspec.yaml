@@ -1,7 +1,7 @@
 name: khuzdar_admin_panel
-description: "A new Flutter project."
+description: "Khuzdar Services admin panel built with Flutter."
 publish_to: 'none'
-version: 0.1.0+1
+version: 1.0.0+1
 
 environment:
   sdk: ^3.11.1
@@ -13,10 +13,8 @@ dependencies:
   firebase_auth: ^6.3.0
   firebase_core: ^4.6.0
   firebase_messaging: ^16.1.3
-  fl_chart: ^1.2.0
   flutter:
     sdk: flutter
-  flutter_animate: ^4.5.2
   go_router: ^17.2.0
   google_fonts: ^8.0.2
   provider: ^6.1.5+1

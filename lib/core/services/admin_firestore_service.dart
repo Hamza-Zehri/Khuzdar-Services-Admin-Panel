@@ -21,7 +21,7 @@ class AdminFirestoreService {
               .where('verificationStatus', isEqualTo: 'pending')
               .count().get();
           final chatsCount = await _db.collection(FirestorePaths.chats)
-              .where('status', isEqualTo: 'CHATTING')
+              .where('status', isEqualTo: ChatStatus.chatting.name)
               .count().get();
               
           if (!controller.isClosed) {

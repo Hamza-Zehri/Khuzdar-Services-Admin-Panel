@@ -5,6 +5,7 @@ import 'firebase_options.dart';
 import 'app.dart';
 import 'providers/admin_auth_provider.dart';
 import 'providers/stats_provider.dart';
+import 'shared/theme/admin_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -31,8 +32,18 @@ void main() async {
           },
         ),
       ],
-      child: !firebaseInitialized 
-        ? const MaterialApp(home: Scaffold(body: Center(child: Text('Failed to initialize Firebase. Please check your configuration.'))))
+      child: !firebaseInitialized
+        ? MaterialApp(
+            theme: AdminTheme.lightTheme,
+            debugShowCheckedModeBanner: false,
+            home: Scaffold(
+              body: Center(
+                child: Text(
+                  'Failed to initialize Firebase. Please check your configuration.',
+                ),
+              ),
+            ),
+          )
         : const AdminApp(),
     ),
   );

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import '../../../core/constants/app_colors.dart';
 import '../../../core/models/all_models.dart';
 import '../../../core/services/admin_firestore_service.dart';
+import '../../../shared/widgets/page_header.dart';
+import '../../../shared/widgets/status_display.dart';
 
 class CategoryManagementScreen extends StatelessWidget {
   const CategoryManagementScreen({super.key});
@@ -10,74 +13,108 @@ class CategoryManagementScreen extends StatelessWidget {
     final firestore = AdminFirestoreService();
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Category Management'),
-      ),
-      body: StreamBuilder<List<CategoryModel>>(
-        stream: firestore.streamCategories(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Padding(
+            padding: EdgeInsets.fromLTRB(24, 24, 24, 0),
+            child: PageHeader(
+              title: 'Category Management',
+              subtitle: 'Organise the service categories shown in the app',
+            ),
+          ),
+          const SizedBox(height: 16),
+          Expanded(
+            child: StreamBuilder<List<CategoryModel>>(
+              stream: firestore.streamCategories(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return StatusDisplay.loading();
+                }
+                if (snapshot.hasError) {
+                  return StatusDisplay.error(detail: '${snapshot.error}');
+                }
 
-          final categories = snapshot.data ?? [];
+                final categories = snapshot.data ?? [];
 
-          if (categories.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text('No categories found.', style: TextStyle(fontSize: 18)),
-                  const SizedBox(height: 16),
-                  ElevatedButton.icon(
-                    onPressed: () => _seedCategories(context),
-                    icon: const Icon(Icons.auto_awesome),
-                    label: const Text('Seed Default Categories'),
-                  ),
-                ],
-              ),
-            );
-          }
+                if (categories.isEmpty) {
+                  return StatusDisplay.empty(
+                    message: 'No categories found',
+                    detail: 'Add your first category or seed the defaults',
+                    onRetry: () => _seedCategories(context),
+                  );
+                }
 
-          return ListView.separated(
-            padding: const EdgeInsets.all(24),
-            itemCount: categories.length,
-            separatorBuilder: (_, _) => const SizedBox(height: 12),
-            itemBuilder: (context, i) {
-              final cat = categories[i];
-              return Card(
-                child: ListTile(
-                  leading: Text(cat.emoji, style: const TextStyle(fontSize: 24)),
-                  title: Text(cat.label),
-                  subtitle: Text(cat.labelUrdu),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.edit_outlined),
-                        onPressed: () => _showCategoryDialog(context, cat),
+                return ListView.separated(
+                  padding: const EdgeInsets.fromLTRB(24, 0, 24, 96),
+                  itemCount: categories.length,
+                  separatorBuilder: (_, _) => const SizedBox(height: 12),
+                  itemBuilder: (context, i) {
+                    final cat = categories[i];
+                    return Container(
+                      decoration: BoxDecoration(
+                        color: AppColors.surface,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: AppColors.border),
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.delete_outline, color: Colors.red),
-                        onPressed: () => _confirmDelete(context, cat),
+                      child: ListTile(
+                        contentPadding:
+                            const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                        leading: Container(
+                          width: 44,
+                          height: 44,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withValues(alpha: 0.08),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(cat.emoji, style: const TextStyle(fontSize: 22)),
+                        ),
+                        title: Text(
+                          cat.label,
+                          style: const TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                        subtitle: Text(
+                          cat.labelUrdu,
+                          style: const TextStyle(color: AppColors.textSecondary),
+                        ),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.edit_outlined),
+                              color: AppColors.textSecondary,
+                              tooltip: 'Edit category',
+                              onPressed: () => _showCategoryDialog(context, cat),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.delete_outline_rounded,
+                                  color: AppColors.danger),
+                              tooltip: 'Delete category',
+                              onPressed: () => _confirmDelete(context, cat),
+                            ),
+                          ],
+                        ),
                       ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          );
-        },
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showCategoryDialog(context, null),
-        icon: const Icon(Icons.add),
+        backgroundColor: AppColors.primary,
+        foregroundColor: Colors.white,
+        icon: const Icon(Icons.add_rounded),
         label: const Text('Add Category'),
       ),
     );
   }
 
-  void _seedCategories(BuildContext context) async {
+  Future<void> _seedCategories(BuildContext context) async {
     final firestore = AdminFirestoreService();
     final defaults = [
       {'label': 'Electrician', 'labelUrdu': 'الیکٹریشن', 'emoji': '⚡', 'order': 1},
@@ -102,7 +139,7 @@ class CategoryManagementScreen extends StatelessWidget {
 
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Default categories added successfully!')),
+        const SnackBar(content: Text('Default categories added successfully')),
       );
     }
   }
@@ -149,6 +186,12 @@ class CategoryManagementScreen extends StatelessWidget {
           ),
           ElevatedButton(
             onPressed: () {
+              if (labelController.text.trim().isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Label is required')),
+                );
+                return;
+              }
               final newCat = CategoryModel(
                 id: category?.id ?? '',
                 label: labelController.text.trim(),
@@ -175,14 +218,17 @@ class CategoryManagementScreen extends StatelessWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Confirm Delete'),
-        content: Text('Are you sure you want to delete "${category.label}"? Providers in this category will lose their connection.'),
+        content: Text(
+          'Are you sure you want to delete "${category.label}"? '
+          'Providers in this category will lose their connection to it.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: const Text('Cancel'),
           ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.danger),
             onPressed: () {
               AdminFirestoreService().deleteCategory(category.id);
               Navigator.pop(context);

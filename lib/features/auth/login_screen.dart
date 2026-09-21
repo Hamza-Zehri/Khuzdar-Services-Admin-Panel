@@ -15,6 +15,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  bool _obscurePassword = true;
 
   @override
   void dispose() {
@@ -24,6 +25,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _login() async {
+    FocusScope.of(context).unfocus();
     if (_formKey.currentState!.validate()) {
       final authProvider = Provider.of<AdminAuthProvider>(
         context,
@@ -53,130 +55,192 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 400),
-          child: Card(
-            child: Padding(
-              padding: const EdgeInsets.all(32.0),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(
-                      Icons.admin_panel_settings,
-                      size: 64,
-                      color: AppColors.primary,
-                    ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      'Admin Login',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 32),
-                    TextFormField(
-                      controller: _emailController,
-                      keyboardType: TextInputType.emailAddress,
-                      autocorrect: false,
-                      decoration: const InputDecoration(
-                        labelText: 'Email',
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.email),
-                      ),
-                      validator: (v) =>
-                          v == null || v.isEmpty ? 'Required' : null,
-                      onChanged: (_) => _clearError(),
-                      onFieldSubmitted: (_) => _login(),
-                    ),
-                    const SizedBox(height: 16),
-                    TextFormField(
-                      controller: _passwordController,
-                      obscureText: true,
-                      decoration: const InputDecoration(
-                        labelText: 'Password',
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.lock),
-                      ),
-                      validator: (v) =>
-                          v == null || v.isEmpty ? 'Required' : null,
-                      onChanged: (_) => _clearError(),
-                      onFieldSubmitted: (_) => _login(),
-                    ),
-                    const SizedBox(height: 32),
-                    Consumer<AdminAuthProvider>(
-                      builder: (context, auth, _) {
-                        if (auth.isLoading) {
-                          return const CircularProgressIndicator();
-                        }
-                        return SizedBox(
-                          width: double.infinity,
-                          height: 48,
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.primary,
-                              foregroundColor: AppColors.surface,
-                            ),
-                            onPressed: _login,
-                            child: const Text('Login'),
-                          ),
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 24),
-                    // Inline error feedback
-                    Consumer<AdminAuthProvider>(
-                      builder: (context, auth, _) {
-                        final error = auth.error;
-                        if (error == null) {
-                          return const SizedBox.shrink();
-                        }
-                        return Container(
-                          width: double.infinity,
-                          margin: const EdgeInsets.only(bottom: 16),
-                          padding: const EdgeInsets.all(12),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFFE6F2ED), AppColors.background, Color(0xFFF1F5F9)],
+          ),
+        ),
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 420),
+              child: Card(
+                elevation: 0,
+                shadowColor: Colors.transparent,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                  side: const BorderSide(color: AppColors.border),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(32, 36, 32, 24),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        // Brand
+                        Container(
+                          width: 64,
+                          height: 64,
+                          alignment: Alignment.center,
                           decoration: BoxDecoration(
-                            color: AppColors.danger.withValues(alpha: 0.08),
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(
-                              color: AppColors.danger.withValues(alpha: 0.5),
+                            gradient: const LinearGradient(
+                              colors: [AppColors.primary, AppColors.primaryLight],
                             ),
-                          ),
-                          child: Row(
-                            children: [
-                              const Icon(
-                                Icons.error_outline,
-                                color: AppColors.danger,
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  error,
-                                  style: const TextStyle(
-                                    color: AppColors.danger,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
+                            borderRadius: BorderRadius.circular(18),
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.primary.withValues(alpha: 0.35),
+                                blurRadius: 16,
+                                offset: const Offset(0, 6),
                               ),
                             ],
                           ),
-                        );
-                      },
+                          child: const Icon(
+                            Icons.admin_panel_settings_rounded,
+                            size: 32,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        const Text(
+                          'Welcome back',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        const Text(
+                          'Sign in to continue to the Khuzdar admin panel',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
+                        ),
+                        const SizedBox(height: 28),
+                        TextFormField(
+                          controller: _emailController,
+                          keyboardType: TextInputType.emailAddress,
+                          autocorrect: false,
+                          autofillHints: const [AutofillHints.username, AutofillHints.email],
+                          textInputAction: TextInputAction.next,
+                          decoration: const InputDecoration(
+                            labelText: 'Email address',
+                            prefixIcon: Icon(Icons.mail_outline_rounded),
+                          ),
+                          validator: (v) {
+                            final value = v?.trim() ?? '';
+                            if (value.isEmpty) return 'Email is required';
+                            if (!value.contains('@')) return 'Enter a valid email address';
+                            return null;
+                          },
+                          onChanged: (_) => _clearError(),
+                          onFieldSubmitted: (_) => _login(),
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: _passwordController,
+                          obscureText: _obscurePassword,
+                          autofillHints: const [AutofillHints.password],
+                          textInputAction: TextInputAction.done,
+                          decoration: InputDecoration(
+                            labelText: 'Password',
+                            prefixIcon: const Icon(Icons.lock_outline_rounded),
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _obscurePassword
+                                    ? Icons.visibility_outlined
+                                    : Icons.visibility_off_outlined,
+                              ),
+                              onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                            ),
+                          ),
+                          validator: (v) =>
+                              v == null || v.isEmpty ? 'Password is required' : null,
+                          onChanged: (_) => _clearError(),
+                          onFieldSubmitted: (_) => _login(),
+                        ),
+                        const SizedBox(height: 24),
+                        Consumer<AdminAuthProvider>(
+                          builder: (context, auth, _) {
+                            return SizedBox(
+                              width: double.infinity,
+                              height: 50,
+                              child: ElevatedButton(
+                                onPressed: auth.isLoading ? null : _login,
+                                child: auth.isLoading
+                                    ? const SizedBox(
+                                        width: 20,
+                                        height: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2.4,
+                                          color: Colors.white,
+                                        ),
+                                      )
+                                    : const Text('Sign In'),
+                              ),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 20),
+                        // Inline error feedback
+                        Consumer<AdminAuthProvider>(
+                          builder: (context, auth, _) {
+                            final error = auth.error;
+                            if (error == null) {
+                              return const SizedBox.shrink();
+                            }
+                            return Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: AppColors.danger.withValues(alpha: 0.07),
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(
+                                  color: AppColors.danger.withValues(alpha: 0.4),
+                                ),
+                              ),
+                              child: Row(
+                                children: [
+                                  const Icon(
+                                    Icons.error_outline_rounded,
+                                    color: AppColors.danger,
+                                    size: 20,
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: Text(
+                                      error,
+                                      style: const TextStyle(
+                                        color: AppColors.danger,
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 13,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 20),
+                        const Text(
+                          '© Developed by Engr. Hamza Asad',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: AppColors.textMuted,
+                            letterSpacing: 0.3,
+                          ),
+                        ),
+                      ],
                     ),
-                    // Developer Credits
-                    const Text(
-                      '© Developed by Engr. Hamza Asad',
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: Color(0xFF9CA3AF),
-                        letterSpacing: 0.3,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
+                  ),
                 ),
               ),
             ),
