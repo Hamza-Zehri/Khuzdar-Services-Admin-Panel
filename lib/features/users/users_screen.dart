@@ -70,6 +70,19 @@ class _UsersScreenState extends State<UsersScreen> {
     });
   }
 
+  String _blockReasonText(UserModel? u) {
+    switch (u?.blockReason) {
+      case 'auto_provider_rating':
+        return 'Auto-blocked: low provider rating (<2★ after 3+ jobs)';
+      case 'auto_client_review':
+        return 'Auto-blocked: ${u?.badReviewsGiven ?? 0} unfair (1-2★) reviews given';
+      case 'admin':
+        return 'Blocked by admin';
+      default:
+        return 'Account status';
+    }
+  }
+
   Future<void> _deleteUser(UserModel user) async {
     final confirmed = await showDialog<bool>(
       context: context,
@@ -161,11 +174,16 @@ class _UsersScreenState extends State<UsersScreen> {
                       DataColumn2(label: Text('Phone'), size: ColumnSize.L),
                       DataColumn2(label: Text('Rating'), size: ColumnSize.S),
                       DataColumn2(label: Text('Role'), size: ColumnSize.S),
-                      DataColumn2(label: Text('Status'), size: ColumnSize.S),
+                      DataColumn2(label: Text('Bad Reviews'),
+                          size: ColumnSize.S),
+                      DataColumn2(label: Text('Status'), size: ColumnSize.M),
                       DataColumn2(label: Text('Actions'), size: ColumnSize.M),
                     ],
                     rows: users.map((u) {
                       final isLowRating = u.rating < 2.0 && u.rating > 0;
+                      final blockLabel = u.isAutoBlocked
+                          ? 'AUTO-BLOCK'
+                          : (u.isBlocked ? 'Blocked' : 'Active');
                       return DataRow(
                         color: WidgetStateProperty.all(
                           u.isBlocked
@@ -212,11 +230,28 @@ class _UsersScreenState extends State<UsersScreen> {
                           DataCell(Text(u.rating.toStringAsFixed(1))),
                           DataCell(Text(capitalize(u.role.name))),
                           DataCell(
-                            BadgeWidget(
-                              text: u.isBlocked ? 'Blocked' : 'Active',
-                              color: u.isBlocked
-                                  ? AppColors.danger
-                                  : AppColors.success,
+                            u.role == UserRole.provider
+                                ? const Text('—')
+                                : Text(
+                                    '${u.badReviewsGiven}',
+                                    style: u.badReviewsGiven >= 3
+                                        ? const TextStyle(
+                                            color: AppColors.danger,
+                                            fontWeight: FontWeight.w700)
+                                        : null,
+                                  ),
+                          ),
+                          DataCell(
+                            Tooltip(
+                              message: _blockReasonText(u),
+                              child: BadgeWidget(
+                                text: blockLabel,
+                                color: u.isBlocked
+                                    ? (u.isAutoBlocked
+                                          ? AppColors.info
+                                          : AppColors.danger)
+                                    : AppColors.success,
+                              ),
                             ),
                           ),
                           DataCell(

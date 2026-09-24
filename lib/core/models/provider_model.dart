@@ -61,6 +61,7 @@ class ProviderModel {
   final int jobsCompleted;
   final VerificationStatus verificationStatus;
   final bool isAvailable;
+  final bool isBlocked;
   final ShopInfo? shop; // only for ProviderType.shop
   final String? profilePic;
   final DateTime createdAt;
@@ -75,6 +76,7 @@ class ProviderModel {
     this.jobsCompleted = 0,
     this.verificationStatus = VerificationStatus.pending,
     this.isAvailable = true,
+    this.isBlocked = false,
     this.shop,
     this.profilePic,
     required this.createdAt,
@@ -101,6 +103,7 @@ class ProviderModel {
         orElse: () => VerificationStatus.pending,
       ),
       isAvailable: d['isAvailable'] ?? true,
+      isBlocked: d['isBlocked'] ?? false,
       shop: d['shop'] != null ? ShopInfo.fromMap(d['shop']) : null,
       profilePic: d['profilePic'],
       createdAt: (d['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
@@ -116,6 +119,7 @@ class ProviderModel {
         'jobsCompleted': jobsCompleted,
         'verificationStatus': verificationStatus.name,
         'isAvailable': isAvailable,
+        'isBlocked': isBlocked,
         'shop': shop?.toMap(),
         'profilePic': profilePic,
         'createdAt': Timestamp.fromDate(createdAt),
@@ -128,6 +132,7 @@ class ProviderModel {
     double? rating,
     int? jobsCompleted,
     VerificationStatus? verificationStatus,
+    bool? isBlocked,
     String? profilePic,
   }) =>
       ProviderModel(
@@ -140,6 +145,7 @@ class ProviderModel {
         jobsCompleted: jobsCompleted ?? this.jobsCompleted,
         verificationStatus: verificationStatus ?? this.verificationStatus,
         isAvailable: isAvailable ?? this.isAvailable,
+        isBlocked: isBlocked ?? this.isBlocked,
         shop: shop,
         profilePic: profilePic ?? this.profilePic,
         createdAt: createdAt,

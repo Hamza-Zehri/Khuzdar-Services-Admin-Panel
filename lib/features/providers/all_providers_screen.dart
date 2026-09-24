@@ -21,6 +21,16 @@ class _AllProvidersScreenState extends State<AllProvidersScreen> {
   String _searchQuery = '';
 
   Future<void> _toggleBlock(ProviderModel provider) async {
+    if (provider.isBlocked) {
+      await _firestoreService.unblockProvider(provider.id);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Provider account unblocked')),
+        );
+      }
+      return;
+    }
+
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -194,9 +204,22 @@ class _AllProvidersScreenState extends State<AllProvidersScreen> {
                           DataCell(Text(p.area)),
                           DataCell(Text(p.rating.toStringAsFixed(1))),
                           DataCell(
-                            BadgeWidget(
-                              text: p.verificationStatus.name.toUpperCase(),
-                              color: statusColor,
+                            Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                BadgeWidget(
+                                  text: p.verificationStatus.name.toUpperCase(),
+                                  color: statusColor,
+                                ),
+                                if (p.isBlocked) ...[
+                                  const SizedBox(height: 6),
+                                  BadgeWidget(
+                                    text: 'BLOCKED',
+                                    color: AppColors.danger,
+                                  ),
+                                ],
+                              ],
                             ),
                           ),
                           DataCell(
@@ -204,9 +227,17 @@ class _AllProvidersScreenState extends State<AllProvidersScreen> {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 IconButton(
-                                  icon: const Icon(Icons.block_rounded,
-                                      color: AppColors.danger),
-                                  tooltip: 'Block account',
+                                  icon: Icon(
+                                    p.isBlocked
+                                        ? Icons.lock_open_rounded
+                                        : Icons.block_rounded,
+                                    color: p.isBlocked
+                                        ? AppColors.success
+                                        : AppColors.danger,
+                                  ),
+                                  tooltip: p.isBlocked
+                                      ? 'Unblock account'
+                                      : 'Block account',
                                   onPressed: () => _toggleBlock(p),
                                 ),
                                 IconButton(

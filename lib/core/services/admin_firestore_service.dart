@@ -97,7 +97,6 @@ class AdminFirestoreService {
   }
 
   Future<void> blockProvider(String providerId) async {
-    // Note: If ProviderModel has no isBlocked, we might need to block the User ID associated
     final doc = await _db.collection(FirestorePaths.providers).doc(providerId).get();
     if (doc.exists) {
       final p = ProviderModel.fromFirestore(doc);
@@ -120,16 +119,34 @@ class AdminFirestoreService {
         .map((snap) => snap.docs.map((d) => UserModel.fromFirestore(d)).toList());
   }
 
-  Future<void> blockUser(String userId) async {
-    await _db.collection(FirestorePaths.users).doc(userId).update({
+  /// Blocks a user and syncs the linked provider profile.
+  Future<void> blockUser(String userId, {String reason = 'admin'}) async {
+    final providerRef = _db.collection(FirestorePaths.providers).doc(userId);
+    final providerSnap = await providerRef.get();
+    final batch = _db.batch();
+    batch.update(_db.collection(FirestorePaths.users).doc(userId), {
       'isBlocked': true,
+      'blockReason': reason,
     });
+    if (providerSnap.exists) {
+      batch.update(providerRef, {'isBlocked': true});
+    }
+    await batch.commit();
   }
 
+  /// Unblocks a user (clears the auto/admin block reason) and syncs providers.
   Future<void> unblockUser(String userId) async {
-    await _db.collection(FirestorePaths.users).doc(userId).update({
+    final providerRef = _db.collection(FirestorePaths.providers).doc(userId);
+    final providerSnap = await providerRef.get();
+    final batch = _db.batch();
+    batch.update(_db.collection(FirestorePaths.users).doc(userId), {
       'isBlocked': false,
+      'blockReason': null,
     });
+    if (providerSnap.exists) {
+      batch.update(providerRef, {'isBlocked': false});
+    }
+    await batch.commit();
   }
 
   Future<String> revealPhone(String userId) async {
@@ -164,6 +181,19 @@ class AdminFirestoreService {
         .orderBy('timestamp', descending: false)
         .snapshots()
         .map((snap) => snap.docs.map((d) => MessageModel.fromFirestore(d)).toList());
+  }
+
+  // Ratings
+  Stream<List<RatingModel>> streamAllRatings() {
+    return _db.collection(FirestorePaths.ratings)
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .map((snap) => snap.docs.map((d) => RatingModel.fromFirestore(d)).toList());
+  }
+
+  /// Permanently removes a single rating document.
+  Future<void> deleteRating(String ratingId) async {
+    await _db.collection(FirestorePaths.ratings).doc(ratingId).delete();
   }
 
   // Reports

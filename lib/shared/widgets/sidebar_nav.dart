@@ -167,6 +167,13 @@ class SidebarNav extends StatelessWidget {
                         onTap: () => context.go('/reports'),
                       ),
                       _NavItem(
+                        icon: Icons.star_outline_rounded,
+                        selectedIcon: Icons.star_rounded,
+                        title: 'Reviews',
+                        isSelected: location == '/reviews',
+                        onTap: () => context.go('/reviews'),
+                      ),
+                      _NavItem(
                         icon: Icons.category_outlined,
                         selectedIcon: Icons.category_rounded,
                         title: 'Categories',

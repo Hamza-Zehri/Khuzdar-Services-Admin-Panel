@@ -15,6 +15,7 @@ import 'features/chats/chats_monitor_screen.dart';
 import 'features/notifications/broadcast_screen.dart';
 import 'features/reports/reports_screen.dart';
 import 'features/categories/screens/category_management_screen.dart';
+import 'features/reviews/reviews_screen.dart';
 
 class AdminApp extends StatelessWidget {
   const AdminApp({super.key});
@@ -69,6 +70,10 @@ class AdminApp extends StatelessWidget {
             GoRoute(
               path: '/reports',
               builder: (context, state) => const ReportsScreen(),
+            ),
+            GoRoute(
+              path: '/reviews',
+              builder: (context, state) => const ReviewsScreen(),
             ),
             GoRoute(
               path: '/categories',
